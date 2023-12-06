@@ -7,8 +7,11 @@ import (
 
 func main() {
 	// SaveData("./sample.txt", [])
-	data := []byte("Hello world")
-	filepath := "sample.txt"
+	var str string
+	fmt.Scanln(&str)
+
+	data := []byte(str)
+	filepath := "./sample.txt"
 
 	err := SaveData(filepath, data)
 	if err != nil {
