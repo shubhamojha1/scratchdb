@@ -1,6 +1,11 @@
-package b_tree
+package main
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 // immutable b+tree
 
@@ -28,12 +33,16 @@ const BTREE_PAGE_SIZE = 4096 // 4K bytes
 const BTREE_MAX_KEY_SIZE = 1000
 const BTREE_MAX_VAL_SIZE = 3000
 
+var Assert *assert.Assertions
+
 func init() {
 	node1max := HEADER + 8 + 2 + 4 + BTREE_MAX_KEY_SIZE + BTREE_MAX_VAL_SIZE
-	assert(node1max <= BTREE_PAGE_SIZE)
+	t := &testing.T{}
+	Assert = assert.New(t)
+	assert.True(t, node1max <= BTREE_PAGE_SIZE, "node1max cannot be greater than BTREE_PAGE_SIZE")
 }
 
-//header
+// header
 func (node BNode) btype() uint16 {
 	return binary.LittleEndian.Uint16(node.data)
 }
@@ -47,14 +56,18 @@ func (node BNode) setHeader(btype uint16, nkeys uint16) {
 	binary.LittleEndian.PutUint16(node.data[2:4], btype)
 }
 
-//pointers
-func (node BNode) getPtr(idx uint16) uint64 {
-	assert(idx < node.nkeys())
+// pointers
+func (node BNode) getPtr(idx uint16, t *testing.T) uint64 {
+	// assert(idx < node.nkeys())
+	condition := idx < node.nkeys()
+	assert.True(t, condition, "idx is not less than node.nkeys()")
 	pos := HEADER + 8*idx
 	return binary.LittleEndian.Uint64(node.data[pos:])
 }
 
-func (node BNode) setPtr(idx uint16, val uint64) {
-	assert(idx < node.nkeys())
-
-pos := HEADER +}
+func (node BNode) setPtr(idx uint16, val uint64, t *testing.T) {
+	condition := idx < node.nkeys()
+	assert.True(t, condition, "idx is not less than node.nkeys()")
+	pos := HEADER + 8*idx
+	binary.LittleEndian.PutUint64(node.data[pos:], val)
+}
