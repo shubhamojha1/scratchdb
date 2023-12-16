@@ -74,7 +74,19 @@ func (node BNode) setPtr(idx uint16, val uint64, t *testing.T) {
 
 // offset list
 
-func offsetPos(node BNode, idx uint16, t *testing.T) {
+func offsetPos(node BNode, idx uint16, t *testing.T) uint16 {
 	condition := 1 <= idx && idx <= node.nkeys()
 	assert.True(t, condition, "index out of bounds!")
+	return HEADER + 8*node.nkeys() + 2*(idx-1)
+}
+
+func (node BNode) getOffset(idx uint16) uint16 {
+	if idx == 0 {
+		return 0
+	}
+	return binary.LittleEndian.Uint16(node.data[offsetPos(node, idx, nil):]) // not sure if `nil` will work
+}
+
+func (node BNode) setOffset(idx uint16, offset uint16) {
+	binary.LittleEndian.PutUint16(node.data[offsetPos(node, idx, nil):], offset)
 }
