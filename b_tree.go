@@ -84,9 +84,36 @@ func (node BNode) getOffset(idx uint16) uint16 {
 	if idx == 0 {
 		return 0
 	}
-	return binary.LittleEndian.Uint16(node.data[offsetPos(node, idx, nil):]) // not sure if `nil` will work
+	return binary.LittleEndian.Uint16(node.data[offsetPos(node, idx, nil):]) // not sure if `nil` will work (?)
 }
 
 func (node BNode) setOffset(idx uint16, offset uint16) {
-	binary.LittleEndian.PutUint16(node.data[offsetPos(node, idx, nil):], offset)
+	binary.LittleEndian.PutUint16(node.data[offsetPos(node, idx, nil):], offset) // (?)
+}
+
+// key-values
+
+func (node BNode) kvPos(idx uint16, t *testing.T) uint16 {
+	condition := idx <= node.nkeys()
+	assert.True(t, condition, "index cannot be greater than number of nodes!")
+	return HEADER + 8*node.nkeys() + 2*node.nkeys() + node.getOffset(idx)
+}
+
+func (node BNode) getKey(idx uint16, t *testing.T) []byte {
+	condition := idx < node.nkeys()
+	assert.True(t, condition, "index out of bounds!")
+
+	pos := node.kvPos(idx, nil) // (?)
+	klen := binary.LittleEndian.Uint16(node.data[pos:])
+	return node.data[pos+4:][:klen]
+}
+
+func (node BNode) getVal(idx uint16, t *testing.T) []byte {
+	condition := idx < node.nkeys()
+	assert.True(t, condition, "index out of bounds!")
+
+	pos := node.kvPos(idx, nil) // (?)
+	klen := binary.LittleEndian.Uint16(node.data[pos+0:])
+	vlen := binary.LittleEndian.Uint16(node.data[pos+2:])
+	return node.data[pos+4+klen:][:vlen]
 }
