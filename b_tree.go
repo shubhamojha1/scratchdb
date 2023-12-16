@@ -117,3 +117,8 @@ func (node BNode) getVal(idx uint16, t *testing.T) []byte {
 	vlen := binary.LittleEndian.Uint16(node.data[pos+2:])
 	return node.data[pos+4+klen:][:vlen]
 }
+
+// node size in bytes
+func (node BNode) nbytes() uint16 {
+	return node.kvPos(node.nkeys(), nil) // (?)
+}
