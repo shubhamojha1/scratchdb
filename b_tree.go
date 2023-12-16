@@ -39,7 +39,7 @@ func init() {
 	node1max := HEADER + 8 + 2 + 4 + BTREE_MAX_KEY_SIZE + BTREE_MAX_VAL_SIZE
 	t := &testing.T{}
 	Assert = assert.New(t)
-	assert.True(t, node1max <= BTREE_PAGE_SIZE, "node1max cannot be greater than BTREE_PAGE_SIZE")
+	assert.True(t, node1max <= BTREE_PAGE_SIZE, "node1max cannot be greater than BTREE_PAGE_SIZE!")
 }
 
 // header
@@ -60,14 +60,21 @@ func (node BNode) setHeader(btype uint16, nkeys uint16) {
 func (node BNode) getPtr(idx uint16, t *testing.T) uint64 {
 	// assert(idx < node.nkeys())
 	condition := idx < node.nkeys()
-	assert.True(t, condition, "idx is not less than node.nkeys()")
+	assert.True(t, condition, "index is not less than node.nkeys()!")
 	pos := HEADER + 8*idx
 	return binary.LittleEndian.Uint64(node.data[pos:])
 }
 
 func (node BNode) setPtr(idx uint16, val uint64, t *testing.T) {
 	condition := idx < node.nkeys()
-	assert.True(t, condition, "idx is not less than node.nkeys()")
+	assert.True(t, condition, "index is not less than node.nkeys()!")
 	pos := HEADER + 8*idx
 	binary.LittleEndian.PutUint64(node.data[pos:], val)
+}
+
+// offset list
+
+func offsetPos(node BNode, idx uint16, t *testing.T) {
+	condition := 1 <= idx && idx <= node.nkeys()
+	assert.True(t, condition, "index out of bounds!")
 }
